@@ -109,11 +109,11 @@ public class Operater {
             result += line;
         }
         JsonObject json = (JsonObject) parser.parse(result);
-        String amount = "";
+        String amount = "0";
         try {
             amount = json.get("getAmount").toString();
         } catch (Exception e) {
-            e.printStackTrace();
+
         }
 
         System.out.println(amount + " " +
