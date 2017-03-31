@@ -19,10 +19,14 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class Main {
 
     private static JsonParser parser = new JsonParser();
+    private static List<JsonObject> user = new ArrayList<JsonObject>();
 
     public static void main(String[] args) throws Exception {
 
@@ -34,21 +38,24 @@ public class Main {
         File file = new File(Main.class.getResource("/").getPath() + "user.conf");
         System.out.println(Main.class.getResource("/").getPath() + "user.conf");
         String encoding = "UTF-8";
+        Random random = new Random();
         if (file.isFile() && file.exists()) {
             InputStreamReader read = new InputStreamReader(new FileInputStream(file), encoding);
             BufferedReader bufferedReader = new BufferedReader(read);
             String lineTxt = null;
             while ((lineTxt = bufferedReader.readLine()) != null) {
                 JsonObject json = parser.parse(lineTxt).getAsJsonObject();
-                System.out.println(json);
-                HandleExecutor.putUser(json);
+                int userId = json.get("userId").getAsInt();
+                String up = json.get("up").getAsString();
+                String token = Operater.login(userId, up);
+                HandleExecutor.userMap.put(userId, token);
+                System.out.println("login " + userId);
+                Thread.sleep(random.nextInt(20000) + 10000);
             }
             read.close();
         }
 
-
         Thread t = new Thread(new Runnable() {
-
             @Override
             public void run() {
                 try {

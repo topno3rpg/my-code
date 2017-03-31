@@ -1,10 +1,6 @@
 package com.melot.executor;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -16,9 +12,7 @@ public class HandleExecutor extends Thread implements Executor {
 
     private static BlockingQueue<Integer> queue = new LinkedBlockingQueue<Integer>();
 
-    private Map<Integer, String> userMap = new HashMap<Integer, String>();
-
-    private static List<JsonObject> user = new ArrayList<JsonObject>();
+    public static Map<Integer, String> userMap = new HashMap<Integer, String>();
 
     @Override
     public void execute() {
@@ -30,19 +24,14 @@ public class HandleExecutor extends Thread implements Executor {
         while (true) {
             try {
                 int roomId = queue.take();
-                for (JsonObject usr : user) {
-                    int userId = usr.get("userId").getAsInt();
-                    String up = usr.get("up").getAsString();
-                    String token = userMap.get(userId);
-                    if (token == null) {
-                        token = Operater.login(userId, up);
-                        userMap.put(userId, token);
-                    }
+                Set<Integer> idSet = userMap.keySet();
+                for (Integer id : idSet) {
+                    String token = userMap.get(id);
                     Set<String> set = ReapExecutor.getUserByRoomId(roomId);
-                    if (set == null || !set.contains(userId + "_" + token)) {
+                    if (set == null || !set.contains(id + "_" + token)) {
                         String ws = Operater.getWsByRoomId(roomId);
-                        SocketClientSlave.connect(userId, roomId, token, ws);
-                        ReapExecutor.putUser(roomId, userId + "_" + token);
+                        SocketClientSlave.connect(id, roomId, token, ws);
+                        ReapExecutor.putUser(roomId, id + "_" + token);
                     }
                 }
             } catch (InterruptedException e) {
@@ -57,7 +46,4 @@ public class HandleExecutor extends Thread implements Executor {
         queue.add(roomId);
     }
 
-    public static void putUser(JsonObject usr) {
-        user.add(usr);
-    }
 }

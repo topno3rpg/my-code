@@ -16,6 +16,8 @@ public class ReapExecutor extends Thread implements Executor {
 
     private static Map<Integer, Set<String>> userMap = new HashMap<Integer, Set<String>>();
 
+    private static Set<String> uniqueSendIdSet = new HashSet<>();
+
     @Override
     public void execute() {
         this.start();
@@ -44,7 +46,8 @@ public class ReapExecutor extends Thread implements Executor {
     }
 
     public static void putData(String data) {
-        queue.add(data);
+        if (uniqueSendIdSet.add(data))
+            queue.add(data);
     }
 
     public static void putUser(int roomId, String user) {

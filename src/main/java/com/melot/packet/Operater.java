@@ -116,7 +116,7 @@ public class Operater {
 
         }
 
-        System.out.println(amount + " " +
+        System.out.println(amount + " " + sendId + " " +
                 roomId + " " + sdf.format(new Date(Long.parseLong(json.get("dtime").toString()))) + " " + userId);
 //		StatisticsExecutor.putData(json);
 
